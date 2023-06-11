@@ -309,12 +309,17 @@ async function handleSearch1(event) {
     const response = await fetch(`/room/api/search?room_name=${roomName}`);
     const data = await response.json();
 
-    console.log(data.room._id)
+    console.log(response)
+
+    if(response.status === 404 || !response.ok){
+      searchResults.innerHTML = "<p>No search Results</p>";
+
+    }
 
     const memberResponse = await fetch(`/room/api/member/${data.room._id}`)
     const memberdata = await memberResponse.json()
 
-    console.log(memberdata)
+    
 
 
     if (response.ok && memberResponse.ok) {
@@ -362,7 +367,7 @@ async function handleSearch1(event) {
                                                                   <td style="vertical-align: middle;">${year}</td>
                                                                   <td >
                                                                     <ul>
-                                                                    ${members.filter(member => member.academicyear === year).map(member => `<li>${member.student_name}</li>`).join('')}
+                                                                    ${members.filter(member => member.academicyear === year).map(member => `<li>${member.student_name} - (${member.sid})</li>`).join('')}
                                                                   </ul>
                                                                 `).join('')}
                                                             </tr>
@@ -381,8 +386,11 @@ async function handleSearch1(event) {
                                 </div><br>
 
                               `;
-    } else if (!response.ok || !memberResponse.ok) {
+    } else if (!response.ok || !memberResponse.ok || response.status == 404) {
       searchResults.innerHTML = "<p>No search Results</p>";
+    } else {
+      searchResults.innerHTML = "<p>No search Results</p>";
+
     }
   }
 

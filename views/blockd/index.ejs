@@ -39,6 +39,10 @@
 			.input-1{
 				color:#4f4f4f;
 			}
+			.error-validation {
+  border-color: red;
+}
+
  </style>
 
 	<main>
@@ -46,7 +50,7 @@
 				<div class="row pb-4">
 					<div class="col-lg-8 col-md-8 col-sm-8 block1">
 						<div class="shadow-box add-block greetings">
-							<p class="block-title ">Block </p>
+							<p class="block-title ">Section</p>
 						</div>
 					
 					</div>
@@ -54,7 +58,7 @@
 					<div class="col-lg-4 col-md-4 col-sm-4 block1">
 						<a class="add" href="#" class="addblik" style="text-decoration:none;">
 						<div class=" add-block add block-a " >
-							<p class="add-block-text text-center">Add block</p>
+							<p class="add-block-text text-center">Add Section</p>
 
 						</div>
 							</a>
@@ -70,7 +74,7 @@
 
 					<div class="col-lg-4 col-md-6 col-sm-12 block1">
 						<div class="shadow-box">
-							<p class="status">Block status: <span clas="act" style="color:#ff4b13"><%= blocks[i].status %></span></p>
+							<p class="status">Section status: <span clas="act" style="color:#ff4b13"><%= blocks[i].status %></span></p>
 
 							<div class="block-details">
 								<i class="material-icons icon"><%= blocks[i].type %></i>
@@ -120,12 +124,14 @@ $(".add").click(function() {
     // Show confirmation message using SweetAlert2
     Swal.fire({
         html: `
-				<h5 class="mt-4 pb-3 font-weight-bold" style="color:#ff4b13; opacity:90%;">Create Block</h5>
+				<h5 class="mt-4 pb-3 font-weight-bold" style="color:#ff4b13; opacity:90%;">Create Section</h5>
 								<form>
 										<div class="form-group" >
 												<div class="input-box">
 														<label class="input-label mt-1" style="color:#4f4f4f">Block Name</label>
-														<input type="text" class="input-1" onfocus="setFocus(true)" id="block-name" onblur="setFocus(false)" style="border-color:#4f4f4f;" />
+														<input type="text" class="input-1"onfocus="setFocus(true)" id="block-name" onblur="validateInput()" style="border-color:#4f4f4f;" />
+														<span id="error-msg" style="color: red;"></span>
+
 												</div>
 
 												<div class="input-box active-grey mt-4">
@@ -156,6 +162,14 @@ $(".add").click(function() {
 					const blockName = document.getElementById('block-name').value;
 					const blockType = document.getElementById('block-type').value;
 					const status = document.getElementById('status').value;
+					if (!isValidYear(blockName)) {
+						document.getElementById('error-msg').textContent = 'Section name should be single character';
+						
+						return null; // Return null to prevent data submission
+					} else {
+						return { blockName, blockType,  status};
+					}
+
 					// Return the values as an object
 					return { blockName, blockType, status };
 				}
@@ -173,7 +187,7 @@ $(".add").click(function() {
 								success: function(response) {
 										// If the block was successfully updated, display a success message using Toastify and reload the page
 										Toastify({
-									      text: 'Block created successfully',
+									      text: 'Section created successfully',
 									      duration: 3000, // Display for 3 seconds
 									      gravity: 'top', // Display at the top of the screen
 									      position: 'center', // Display in the center of the screen
@@ -190,7 +204,7 @@ $(".add").click(function() {
 										// If there was an error updating the block, display an error message using Toastify
 										if(error.statusText == "Unprocessable Entity"){
                     Toastify({
-                      text: 'Given Block Name already exists',
+                      text: 'Given Section Name already exists',
                       duration: 4000, // Display for 3 seconds
                       gravity: 'top', // Display at the top of the screen
                       position: 'center',
@@ -202,7 +216,6 @@ $(".add").click(function() {
 
                   }else {
                     Toastify({
-                      
                       text: 'Please enter details.',
                       duration: 4000, // Display for 3 seconds
                       gravity: 'top', // Display at the top of the screen
@@ -222,6 +235,24 @@ $(".add").click(function() {
     });
 });
 
+function validateInput() {
+  var input = document.getElementById('block-name').value;
+
+  if (!/^[A-Z]$/.test(input)) {
+    document.getElementById('error-msg').textContent = 'Please enter a single capital letter.';
+    document.getElementById('block-name').classList.add('error-validation');
+  } else {
+    document.getElementById('error-msg').textContent = '';
+    document.getElementById('block-name').classList.remove('error-validation');
+  }
+}
+
+function isValidYear(year) {
+  var pattern = /^[A-Z]$/;
+  return pattern.test(year);
+}
+
+
 </script>
 
 
@@ -235,7 +266,7 @@ $(".delete").click(function() {
     // Show confirmation message using SweetAlert2
     Swal.fire({
         // title: "Are you sure?",
-        html: "<h6 style='font-weight: 400; font-size:18px; opacity:90%; margin-top:2rem; color:#4f4f4f;'>Are you sure you want to delete the Block ?<h6>",
+        html: "<h6 style='font-weight: 400; font-size:18px; opacity:90%; margin-top:2rem; color:#4f4f4f;'>Are you sure you want to delete the Section ?<h6>",
         showCancelButton: true,
         confirmButtonColor: "#ff4b13",
         cancelButtonColor: "#ffffff",
@@ -251,7 +282,7 @@ $(".delete").click(function() {
                 success: function(response) {
                     // If the block was successfully deleted, display a success message using Toastify and reload the page
                    Toastify({
-									      text: 'Block deleted successfully',
+									      text: 'Section deleted successfully',
 									      duration: 3000, // Display for 3 seconds
 									      gravity: 'top', // Display at the top of the screen
 									      position: 'center', // Display in the center of the screen
@@ -265,7 +296,7 @@ $(".delete").click(function() {
                 error: function(error) {
                     // If there was an error deleting the block, display an error message using Toastify
                     Toastify({
-                        text: "Error deleting block. Try again!",
+                        text: "Error deleting Section. Try again!",
                         backgroundColor:'rgba(243,209,209,1)',
                         className: "error",
 												position:"top-center",
@@ -310,7 +341,7 @@ $(".delete").click(function() {
 		        success: function(response) {
 		            // If the block details were successfully fetched, display them in the input form inside the SweetAlert popup
 		            Swal.fire({
-		                html: `<h5 class="mt-4 pb-3 font-weight-bold" style="color:#ff4b13; font-size:16px; opacity:90%;">Update Block</h5>
+		                html: `<h5 class="mt-4 pb-3 font-weight-bold" style="color:#ff4b13; font-size:16px; opacity:90%;">Update Section</h5>
 		                        <form>
 		                            <div class="form-group">
 		                                <div class="input-edit  mt-4">
@@ -366,7 +397,7 @@ $(".delete").click(function() {
 													success: function(response) {
 															// If the block was successfully updated, display a success message using Toastify and reload the page
 															Toastify({
-																	text: "Block updated successfully!",
+																	text: "Section updated successfully!",
 																	backgroundColor:'rgba(196,293,206,1)',
 																	className: "toastify-success",
 																	position:"top-center",
@@ -376,7 +407,7 @@ $(".delete").click(function() {
 													error: function(error) {
 															// If there was an error updating the block, display an error message using Toastify
 															Toastify({
-																	text: "Error updating block: " + error.responseText,
+																	text: "Error updating Section: " + error.responseText,
 																	backgroundColor:'rgba(243,209,209,1)',
 																	className: "error",
 																	position:"top-center",
@@ -389,7 +420,7 @@ $(".delete").click(function() {
 		        error: function(error) {
 		            // If there was an error fetching the block details, display an error message using Toastify
 		            Toastify({
-		                text: "Error while updating block. Try again!",
+		                text: "Error while updating Section. Try again!",
 		                backgroundColor: "rgba(243,209,209,1)",
 		                className: "error",
 		            }).showToast();

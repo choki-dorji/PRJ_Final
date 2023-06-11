@@ -9,6 +9,7 @@ const student = require("./apiconnection_lakshay/getStudents");
 
 const allocateRoomByYearAndBlock = async (req, res, next) => {
   currentYear = req.params.year;
+
   const { years, maleBlock, femaleBlock } = req.body;
   const bid = [...maleBlock, ...femaleBlock];
 
@@ -18,12 +19,12 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
     return res.status(error.code).json({ message: error.message });
   }
 
-  if (req.body.femaleBlock.length === 0) {
+  if (req.body.maleBlock.length === 0) {
     const error = new HttpError(`Please choose male block to allocate`, 404);
     console.log(error.message);
     return res.status(error.code).json({ message: error.message });
   }
-  if (req.body.femaleBlock === 0) {
+  if (req.body.femaleBlock.length === 0) {
     const error = new HttpError(`Please choose female block to allocate`, 404);
     console.log(error.message);
     return res.status(error.code).json({ message: error.message });
@@ -79,6 +80,7 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
     }
   }
   let veriifyYear;
+
   try {
     veriifyYear = await AcadYear.findOne({ Year: currentYear });
     console.log("success current year", veriifyYear);
@@ -91,12 +93,22 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
     throw new Error("Invalid year entered");
   }
 
-  const allocatedRoomIds = (await Allocate.find({ year: currentYear })).map(
+  const allocated_room_id = (await Allocate.find({ year: currentYear })).map(
     (allocation) => allocation.roomid
   );
-  const rooms = await Room.find();
+  const rooms = await Room.find({
+    blockid: { $in: [...maleBlock, ...femaleBlock] },
+  });
   for (const room of rooms) {
-    if (!allocatedRoomIds.includes(room._id)) {
+    const room_capacity = room.room_capacity;
+    await Room.updateOne(
+      { _id: room._id },
+      { $set: { availability: room_capacity, members: [] } }
+    );
+  }
+
+  for (const room of rooms) {
+    if (!allocated_room_id.includes(room._id)) {
       const room_capacity = room.room_capacity;
       await Room.updateOne(
         { _id: room._id },
@@ -108,7 +120,8 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
   try {
     //*********************getting student Data****************************** */
     // const students = student.GetStudents(req, res, years);
-    const students = student.GetStudents(years);
+    const students = await student.GetStudents(years);
+    console.log(students);
 
     // console.log("student", students);
     //**********************************grouping students into course******************* */
@@ -189,9 +202,9 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
       // console.log(blockName);
       // console.log("rooms", rooms);
 
-      // console.log("total capacity ", totalCapacity);
-      // console.log("male ", maleLength);
-      // console.log("female", femaleLength);
+      console.log("total capacity ", totalCapacity);
+      console.log("male ", maleLength);
+      console.log("female", femaleLength);
 
       if (totalCapacity > maleLength || totalCapacity > femaleLength) {
         for (const student of [...maleStudents, ...femaleStudents]) {
@@ -229,6 +242,7 @@ const allocateRoomByYearAndBlock = async (req, res, next) => {
           // console.log("allocation start, if loop");
           if (room) {
             console.log("room is found", room);
+
             try {
               await Room.findByIdAndUpdate(room, {
                 $inc: { availability: -1 },

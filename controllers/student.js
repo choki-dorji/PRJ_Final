@@ -283,7 +283,7 @@ exports.searchStudentsBySID = async (req, res) => {
     return res.status(error.code || 500).json({ message: error.message });
   }
   //console.log("sedfghjkl;");
-  const studentdata = api_students.GetAllStudents();
+  const studentdata = await api_students.GetAllStudents(req, res);
   // //console.log("students ", studentdata);
   //console.log(typeof JSON.stringify(studentdata));
   //console.log(typeof studentSID);
@@ -337,11 +337,12 @@ exports.searchStudentsBySID = async (req, res) => {
   // }
 };
 
-exports.countStudentsByYear = (req, res) => {
+exports.countStudentsByYear = async (req, res) => {
   const years = req.params.years;
+  console.log("year");
 
-  const students = api_students.countStudentsByYearDisable(years);
-
+  const students = await api_students.countStudentsByYearDisable(req, res, years);
+  console.log("dfghjk", students);
   res.send(students);
 };
 

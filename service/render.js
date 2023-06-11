@@ -118,6 +118,17 @@ exports.getBlocks = async (req, res) => {
                 return acc;
               }, {});
             }
+
+            const sortedData = Object.entries(groupedData)
+              .sort(([yearA], [yearB]) => {
+                const yearOrder = { year1: 1, year2: 2, year3: 3, year4: 4 };
+                return yearOrder[yearA] - yearOrder[yearB];
+              })
+              .reduce((acc, [year, genderCounts]) => {
+                acc[year] = genderCounts;
+                return acc;
+              }, {});
+
             console.log("grouped data", groupedData);
             console.log("host", req.hostname);
             res.render("Dashboard/index", {
@@ -127,7 +138,8 @@ exports.getBlocks = async (req, res) => {
               recentactivity: recent.data,
               username: username,
               token: token,
-              chart: groupedData,
+              // chart: groupedData,
+              chart: sortedData,
               notificationCount: notificationCount,
             });
           }
@@ -434,6 +446,7 @@ exports.displaycreateallocation = async function (req, res) {
   const year = req.query.year;
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+  const yearSelect = req.query.year;
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
 
@@ -442,17 +455,35 @@ exports.displaycreateallocation = async function (req, res) {
     axios.get(API + "allocate/all"),
     axios.get(API + "room/api/rooms"),
     axios.get(API + "students/allstudents"),
+    axios.get(API + `year/allocations`),
   ])
     .then((responses) => {
+      const block_ = [];
+      const alloc_year = [];
       const blockData = responses[0].data;
       const allocation = responses[1].data;
       const roomresponse = responses[2].data;
       const studentResponse = responses[3].data;
-      console.log("allocations", allocation);
+      const YearResponse = responses[4].data;
+
+      for (var i = 0; i < allocation.length; i++) {
+        block_.push(allocation[i].blockid);
+      }
+
+      for (var i = 0; i < YearResponse.length; i++) {
+        alloc_year.push(YearResponse[i].Year);
+      }
+
+      console.log(studentResponse);
+
+      // console.log("allocations", allocation);
       res.render("Allocation/createalllocation", {
         block: blockData,
         allocate: allocation,
+        blocks: block_,
+        alloc_year: alloc_year,
         token: token,
+        yearSelect: yearSelect,
         year: year,
         room: roomresponse,
         students: studentResponse,

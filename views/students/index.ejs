@@ -258,8 +258,13 @@
 									<%= userdata.name %> <br>
 								</b>
 								<div class="profile-details text-center pt-3">
+									<% const x = userdata.year_enrolled 
+										const date = new Date(x)
+										const year = date.getFullYear()
 
-									<span class="de">Year: IV<%= userdata.year %></span> <br>
+										const curryear  = new Date().getFullYear()
+									%> 
+									<span class="de">Year: <%= curryear -  year  %></span> <br>
 									<span class="de"><a><%= userdata.email %></a></span><br>
 									<span class="de"> <%= userdata.specializationid === 1 ? "FullStack" :
 										userdata.specializationid === 2 ? "BlockChain" :
@@ -269,7 +274,7 @@
 										<% for (var j = 0; j < allocate.length; j++) { %>
 											<% if (room[i]._id === allocate[j].roomid && allocate[j].sid == userdata.sid) { %>
 											<button disabled class="butt1"><span>Room <%= room[i].room_name%></span></button>
-											<button disabled class="butt2"><span>Block <%= allocate[j].block_name %></span></button>
+											<button disabled class="butt2"><span>Section <%= allocate[j].block_name %></span></button>
 											<% } %>
 										
 											<% } %>
@@ -301,15 +306,14 @@
 										<th scope="row"><%= j+1 %></th>
 										<td><%= roommate[j].student_name %></td>
 										<td><%= roommate[j].course %></td>
-										<td>IV</td>
+										<td><%= curryear -  year %></td>
 										<td><%= roommate[j].sid %>.gcit@rub.edu.bt</td>
 									</tr>
 									<% } %>
 									</tbody>
 				<% } else { %>
 					<tr>
-						<th scope="row" colspan="5" style="text-align: center;" >No Room Mate </th>
-					
+						<th scope="row" colspan="5" style="text-align: center;" >No Roommate </th>					
 					</tr>
 					
 					</tbody>
@@ -504,17 +508,22 @@ document.getElementById("logout-link").addEventListener("click", function(e) {
 								<form enctype="multipart/form-data">
 									<div class="form-group">
 										<div class="input-box active-grey">
-											<label class="input-label">Block Name</label>
+											<label class="input-label">Section Name</label>
 											<select class="input-1" onfocus="setFocus(true)" onblur="setFocus(false)" id="block-type" required  onchange="myFunction()"style="color:#4f4f4f; border-color:#4f4f4f; font-size:16px;" >
 												<option value="" disabled selected>Select Block</option>
 												<% for(var j = 0; j < block.length; j++) { %>
+												
+												
 													<%
 													var room = userdata.gender === 'F' ? 'girls' : 'boys';
+													
 													if(block[j].type === room && block[j].status === "available") { %>
+														
 														<% if (block[j].no_of_rooms !== 0) { %>
 															<option value="<%= block[j]._id %>">block <%= block[j].block_name %></option>
 														<% } %>
 													<% } %>
+													
 												<% } %>
 											</select>
 										</div>
@@ -615,9 +624,10 @@ document.getElementById("logout-link").addEventListener("click", function(e) {
           $("#room-select").empty();
           // Add new options to the room select element based on the response
           for (var i = 0; i < response.length; i++) {
-			if(response[i].status !== "unavailable" && response[i].isDisabled === false && response[i].availability === response[i].room_capacity){
-            $("#room-select").append(`<option value="${response[i]._id}">${response[i].room_name}</option>`);
-			}
+				if(response[i].status !== "unavailable" && response[i].isDisabled === false && response[i].availability === response[i].room_capacity){
+					$("#room-select").append(`<option value="${response[i]._id}">${response[i].room_name}</option>`);
+				}
+			
           }
         },
         error: function(error) {
@@ -798,17 +808,6 @@ document.getElementById("logout-link").addEventListener("click", function(e) {
 		});
 	})
 
-</script>
-<script type="text/javascript">
-    (function(d, m){
-        var kommunicateSettings = 
-            {"appId":"25f7bf7d8fec4986abcc384acb0748266","popupWidget":true,"automaticChatOpenOnNavigation":true};
-        var s = document.createElement("script"); s.type = "text/javascript"; s.async = true;
-        s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
-        var h = document.getElementsByTagName("head")[0]; h.appendChild(s);
-        window.kommunicate = m; m._globals = kommunicateSettings;
-    })(document, window.kommunicate || {});
-/* NOTE : Use web server to view HTML files as real-time update will not work if you directly open the HTML file in the browser. */
 </script>
 
 </body>

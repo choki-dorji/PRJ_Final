@@ -230,11 +230,11 @@ select{
   </div>
 
   <div class="input-box">
-    <label class="input-label"style="color:#4f4f4f;">Block</label>
+    <label class="input-label"style="color:#4f4f4f;">Section</label>
     <select class="input-1" id="block-id" name="blockid" required onfocus="setFocus(true)" onblur="setFocus(false)"  style="border-color:#4f4f4f;font-size:16px;">
       <option value="" disabled selected></option>
       <% for(var j = 0; j < block.length; j++)  { %>
-      <option value="<%= block[j]._id %>"><%= block[j].block_name %></option>
+      <option value="<%= block[j]._id %>">Section <%= block[j].block_name %></option>
       <% } %>
 
     </select>

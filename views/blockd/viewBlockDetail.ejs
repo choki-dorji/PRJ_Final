@@ -42,7 +42,7 @@
                          <div class="box ml-3">
                              <div class="di">
                                  <h5 class="fon font-weight-bold nt"><%= block.block_name %></h5>
-                                 <h6 class="fon roo sttt">Block</h6>
+                                 <h6 class="fon roo sttt">Section</h6>
                              </div>
                              <div class="ico di">
                                  <i class='far fa-building bulid'></i>
@@ -300,7 +300,7 @@ $(".addroom").click(function() {
                       onClick: function() { Toastify.hideAll() } // Hide all toasts when clicked
                     }).showToast();
 
-                  }else if (error.status === "422") {
+                  }else if (error.status === 422) {
                 Toastify({
 
                   text: 'Room already exists',
