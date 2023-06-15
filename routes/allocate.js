@@ -20,6 +20,8 @@ route.get("/disable", service.disable);
 // API
 route.post("/api/years/:year", allocateController.allocateRoomByYearAndBlock);
 route.get("/api/years/:year", allocateController.getallocationbyYear);
+route.get("/api/unallocatestudents/", allocateController.ListOfUnallocated);
+route.post("/api/manual/", allocateController.manualAllocation);
 
 route.get("/all", allocateController.getallocation);
 

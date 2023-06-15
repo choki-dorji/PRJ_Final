@@ -383,6 +383,117 @@ const getTotalCapacityByBlock = async (req, res, next) => {
   }
 };
 
+exports.ListOfUnallocated = async (req, res) => {
+  let allocations;
+  try {
+    allocations = await Allocate.find({
+      academicyear: new Date().getFullYear(),
+    });
+  } catch (err) {
+    const error = new HttpError("Fetching allocation failed", 500);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  const students = await student.GetAllStudents(req, res);
+  console.log("studenrts", students);
+
+  // Check if each student is not present in allocations
+  const allocatedStudentIds = allocations.map((allocation) => allocation.sid);
+  console.log("is", allocatedStudentIds);
+
+  // Find the students who are not allocated
+  const unallocatedStudents = students.filter(
+    (student) => !allocatedStudentIds.includes(student.sid.toString())
+  );
+
+  console.log(unallocatedStudents.length);
+
+  // Return the unallocated students
+  return res.json({ unallocatedStudents });
+};
+
+// manual allocation
+exports.manualAllocation = async (req, res) => {
+  const currentDate = new Date();
+  const year1 = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1;
+  const day = currentDate.getDate();
+
+  const {
+    student,
+    student_name,
+    student_email,
+    sid,
+    course,
+    year,
+    student_gender,
+    roomid,
+    blockid,
+    isDisabled,
+  } = req.body;
+
+  // find block name
+  let block_name1;
+  let blocks;
+  try {
+    blocks = await Block.findOne({ _id: blockid });
+    block_name1 = blocks.block_name;
+  } catch (err) {
+    const error = new HttpError("Unknown error, Try again later", 500);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+
+  let existingBlock;
+  let room_name1;
+  try {
+    existingBlock = await Room.findOne({ _id: roomid });
+    room_name1 = existingBlock.room_name;
+  } catch (err) {
+    const error = new HttpError("Unknown error, Try again later", 500);
+    return res.status(error.code || 500).json({ message: error.message });
+  }
+  console.log("room", existingBlock);
+
+  if (existingBlock) {
+    if (existingBlock.availability === 0) {
+      const error = new HttpError("Unable to allocate rooms", 500);
+      return res.status(error.code || 500).json({ message: error.message });
+    } else if (existingBlock.availability !== 0) {
+      const Allocations = new Allocate({
+        student: student,
+        student_name: student_name,
+        student_email: student_email,
+        sid: sid,
+        course: course,
+        year: year,
+        student_gender: student_gender,
+        roomid: roomid,
+        room_name: room_name1,
+        block_name: block_name1,
+        blockid: blockid,
+        academicyear: year1,
+        isDisabled: isDisabled,
+        created: `${day}/${month}/${year1}`,
+      });
+
+      try {
+        await Allocations.save();
+        await Room.findByIdAndUpdate(roomid, {
+          $inc: { availability: -1 },
+        });
+      } catch (err) {
+        console.log(err);
+        const error = new HttpError(
+          "creating allocations failed, please try again",
+          500
+        );
+        return res.status(error.code || 500).json({ message: error.message });
+      }
+      return res.status(201).json({ message: "Room Allocated Successfully" });
+    }
+  }
+};
+
 exports.getTotalCapacityByBlock = getTotalCapacityByBlock;
 exports.allocateRoomByYearAndBlock = allocateRoomByYearAndBlock;
 exports.getallocation = getallocation;

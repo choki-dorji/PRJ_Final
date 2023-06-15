@@ -1,27 +1,24 @@
 const HttpError = require("../../models/httperror");
 const axios = require("axios");
 
+const LOGIN = process.env.LEGSHAY_API_LOGIN;
+const DATA = process.env.LEGSHAY_API_DATA;
+
 const Logins = async () => {
-  const response1 = await axios.post(
-    "https://gcit-user-management.onrender.com/api/v1/UM/login",
-    {
-      username: "group12",
-      password: "group12",
-    }
-  );
+  const response1 = await axios.post(LOGIN, {
+    username: "group12",
+    password: "group12",
+  });
 
   console.log(response1.data.token);
 
   try {
-    const response = await axios.get(
-      "https://gcit-user-management.onrender.com/api/v1/UM/join",
-      {
-        headers: {
-          Authorization: "Bearer " + response1.data.token,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.get(DATA, {
+      headers: {
+        Authorization: "Bearer " + response1.data.token,
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (e) {
     console.log(e);

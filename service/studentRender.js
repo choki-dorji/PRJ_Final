@@ -10,6 +10,10 @@ console.log("API: " + API);
 exports.StudentDashboard = (req, res) => {
   // calling student to get their detail
   const userdata = req.cookies.userData;
+
+  if (!userdata) {
+    return res.redirect("/login");
+  }
   const user = JSON.parse(userdata);
 
   // console.log(user);
@@ -55,6 +59,11 @@ exports.StudentDashboard = (req, res) => {
 exports.search_student = async (req, res) => {
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   console.log("user: " + username);
   const notificationCount = await Request.countDocuments({ clicked: false });

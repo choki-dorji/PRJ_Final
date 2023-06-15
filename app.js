@@ -35,14 +35,6 @@ app.use(cookieParser());
 //   next();
 // };
 
-// const checkAuth = (req, res, next) => {
-//   const token = req.cookies.token; // Modify this according to your token storage mechanism
-//   if (!token) {
-//     return res.redirect("/login");
-//   }
-//   next();
-// };
-
 app.use("/", blockRoute.route);
 
 app.use("/landing", landing.route);
@@ -85,6 +77,24 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 //   const error = new HttpError("could not find this route", 404);
 //   throw error;
 // });
+
+app.use((req, res, next) => {
+  const token = req.cookies.tokenABC;
+
+  // Exclude /login and /authenticate routes from token check
+  if (req.path === "/login") {
+    return next();
+  }
+
+  // Check if the token exists
+  if (!token) {
+    return res.redirect("/login");
+  }
+
+  // Pass the token to the request object for further processing
+  req.token = token;
+  next();
+});
 
 app.use((error, req, res, next) => {
   if (error.code === "ENOTFOUND") {

@@ -1,22 +1,24 @@
 const axios = require("axios");
 const { route } = require("../routes/chart");
+
+const LOGIN = process.env.LEGSHAY_API_LOGIN;
+
 exports.Login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const response = await axios.post(
-      "https://gcit-user-management.onrender.com/api/v1/UM/login",
-      {
-        username,
-        password,
-      }
-    );
+    const response = await axios.post(LOGIN, {
+      username,
+      password,
+    });
     const user = response.data;
+
+    let token;
 
     if (user && user.token) {
       const roleid = user.data.user.rows[0].roleid;
 
       // res.cookie("token", user.token, { httpOnly: true });
-      const token = user.token;
+      token = user.token;
       res.cookie("tokenABC", token);
       console.log("token", req.cookies.tokenABC);
 
@@ -30,6 +32,8 @@ exports.Login = async (req, res) => {
           `/students?username=${user.data.user.rows[0].name}&token=${user.token}`
         );
       }
+    } else if (!token) {
+      res.redirect("/login");
     } else {
       res.redirect("/login?error=Invalid username or password");
     }

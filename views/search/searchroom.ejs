@@ -32,7 +32,7 @@
 
     const roomName = searchForm.elements.room_name.value;
 
-    const response = await fetch(`https://hostel-allocation-system.onrender.com/room/api/search?room_name=${roomName}`);
+    const response = await fetch(`localhost:5000/room/api/search?room_name=${roomName}`);
     const data = await response.json();
     console.log(data)
 
@@ -60,7 +60,7 @@
     const studentName = studentSearchForm.elements.student_name.value;
      console.log("res[ponse")
 
-    const response = await fetch(`https://hostel-allocation-system.onrender.com/students/search?studentName=${studentName}`);
+    const response = await fetch(`localhost:5000/students/search?studentName=${studentName}`);
 
     console.log("response", response)
 
@@ -211,15 +211,15 @@ async function handleSearch1(event) {
                                                         <td scope="row"> ${student.gender}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th>email</th>
+                                                        <th>Email</th>
                                                         <td scope="row"> ${student.email} </td>
                                                     </tr>
                                                     <tr>
-                                                        <th>course</th>
+                                                        <th>Course</th>
                                                         <td scope="row"> ${student.specialization} </td>
                                                     </tr>
                                                     <tr>
-                                                        <th>year</th>
+                                                        <th>Year</th>
                                                         <td scope="row"> ${student.year} </td>
                                                     </tr>
                                                     <tr >
@@ -241,7 +241,7 @@ async function handleSearch1(event) {
 
                               `;
 
-    fetch(`https://hostel-allocation-system.onrender.com/students/getroom/${student.sid}`)
+    fetch(`/students/getroom/${student.sid}`)
     .then(response => response.json())
     .then(data => {
         const roomData = data.room;

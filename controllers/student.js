@@ -204,10 +204,10 @@ exports.hostelChangeRequest = async (req, res) => {
       const month = now.getMonth() + 1;
       const day = now.getDate();
       const hours = now.getHours();
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
+      console.log(now);
 
-      const curdate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      const currentdate = `${year}-${month}-${day} `;
+      console.log(currentdate);
 
       // Create a new request object
       const request = new Request({
@@ -216,7 +216,7 @@ exports.hostelChangeRequest = async (req, res) => {
         block: currentBlock._id,
         targetblock: block._id,
         targetroom: room._id,
-        Requested: curdate,
+        Requested: currentdate,
         status: "pending",
         Remarks: "requested",
         image: filekey,
@@ -256,8 +256,23 @@ exports.editstudents = async (req, res) => {
       });
     }
 
+    // Retrieve the roomId from the deleted allocation
+    const roomId = deletedStudent.roomid;
+
+    // Increment the availability field in the room database
+    try {
+      const room = await rooms.findOne({ _id: roomId });
+      room.availability += 1;
+      await room.save();
+    } catch (error) {
+      // Handle any errors that occur during the update
+      return res.status(500).send({
+        message: "Error occurred while updating room availability",
+      });
+    }
+
     res.send({
-      message: "Student was deleted successfully!",
+      message: "Student was deleted successfully! Room availability updated.",
     });
   } catch (err) {
     //console.error(err);
@@ -341,7 +356,11 @@ exports.countStudentsByYear = async (req, res) => {
   const years = req.params.years;
   console.log("year");
 
-  const students = await api_students.countStudentsByYearDisable(req, res, years);
+  const students = await api_students.countStudentsByYearDisable(
+    req,
+    res,
+    years
+  );
   console.log("dfghjk", students);
   res.send(students);
 };

@@ -32,11 +32,66 @@
 					padding-left:2rem; /* Set the border properties as per your requirement */
 								margin-bottom:2rem;
 		    }
+
+  .add-std {
+  width: 150px;
+  border-radius: 5px;
+  background: #ff4b13;
+  position: absolute;
+  border: none;
+  opacity: 90%;
+  color: white;
+  right: 11rem;
+  top: 1.5rem;
+  cursor: pointer;
+}
+.add-std:active,
+.add-std:focus {
+  outline: none;
+  border: none;
+}
+@media (max-width: 769px){
+  .add-std {
+    position: absolute;
+    top: 3.9rem;
+    right: 9.2rem;
+    
+  }
+  .table-responsive{
+    margin-top: 3rem;
+  }
+}
+
+.tab tr {
+  margin-left: 1rem;
+  color: #ffffff;
+}
+.tab {
+  width: 100%;
+
+}
+ .tab td,
+ .tab th {
+  padding: 1rem;
+  vertical-align: top;
+  border: 1px solid #d7c8c8;
+  opacity: 90%;
+}
+.tab tbody tr {
+  color: #4f4f4f;
+}
+.tab thead th {
+  vertical-align: bottom;
+  border: 2px solid #e9e0e0;
+  background: #ff4b13;
+  opacity: 90%;
+}
       
 </style>
 
  <section id="stat">
              <div class="col">
+             
                  <div class="col-lg-12 col-md-12 col-sm-12">
                      <di v class="bx-shadow5">
                          <div class="box ml-3">
@@ -77,6 +132,7 @@
                              Room details
                          </h5>
                          <button class="room-add-but pb-2 pt-2 addroom">Add room</button>
+                         <button class="add-std pb-2 pt-2" blockdata="<%= block.type %>"  id="View_unallocated">View Unallocated</button>
                          <div class="table-responsive " style="overflow-x:auto; ">
                              <table class="tab p-2 mt-2 text-center" style="margin:0 auto;">
                                  <thead>
@@ -88,7 +144,8 @@
                                          <th scope="col">SID</th>
                                          <th scope="col">Course</th>
                                          <th scope="col">Year</th>
-                                         <!-- <th scope="col">Action</th> -->
+                                         <th scope="col">Delete Students</th>
+                                         <th scope="col">Add Students</th>
                                      </tr>
                                  </thead>
                                  <tbody>
@@ -96,14 +153,14 @@
                                    for(var i = 0; i < rooms.length; i++) { %>
                                      <% if (rooms[i].blockid === block._id) { %>
                                        <% var studentsInRoom = allocate.filter(a => a.roomid === rooms[i]._id); %>
-                                       <% console.log("fghjkl", studentsInRoom)
+                                    
                                      
                                        %>
                                        <% if (studentsInRoom.length > 0) { 
                                         
                                         %>
                                       
-                                         <tr <% if (rooms[i].isDisabled) { %>class="disabled-row"<% } %>>
+                                         <tr   <% if (rooms[i].isDisabled) { %>class="disabled-row"<% } %> >
                                            <td><%= k %></td>
                                            <td><%= rooms[i].room_name %></td>
                                            <td><%= rooms[i].room_capacity %></td>
@@ -139,14 +196,25 @@
                                                <% } %>
                                              <% }); %>
                                            </td>
-                                           <!-- <td>
+                                           <td>
+                                             <!-- <i class="bx bx-trash room-ico add"></i>
+                                             <i class='bx bx-message-square-add std-add-room' style="font-size: 24px; color: #FF4B13;"></i> -->
+
                                              <% studentsInRoom.forEach(function(student, index) { %>
-                                               <i data-id=<%= student.sid %> class="bx bx-trash room-ico add"></i>
+                                               <i style="font-size: 24px;" data-id=<%= student.sid %> class="bx bx-trash room-ico add"></i>
                                                <% if (index < studentsInRoom.length - 1) { %>
                                                  <br>
                                                <% } %>
                                              <% }); %>
-                                           </td> -->
+                                           </td>
+                                           <td>
+
+                                            <button data-blockid="block._id" data-id = <%= rooms[i]._id %> class="add-bu p-1 myButton" ><span><i
+                                              class="far fa-outline fa-user">
+                                          </i></span>
+                                            Add
+                                           </button>
+                                           </td>
                                          </tr>
                                          
 
@@ -159,22 +227,19 @@
                                          <td class="mw-100">
                                            <%= rooms[i].room_capacity %>
                                          </td>
-                                         <td>
-                                           <p>No students in the room</p>
-                                         </td>
-                                         <td>
-
-                                         </td>
-                                         <td>
-
-                                         </td>
-                                         <td>
-
-                                         </td>
-                                         <!-- <td>
-                                           <i class="bx bx-trash room-ico"></i>
-                                         </td> -->
-                                       </tr>
+                                         
+                                         <td colspan="5">
+                                          <p>No students in the room</p>
+                                        </td>
+                                        <td>
+                                          <button  class="add-bu p-1 myButton" data-blockid="block._id" data-id = <%= rooms[i]._id %> ><span><i
+                                            class="far fa-outline fa-user">
+                                        </i></span>
+                                          Add
+                                        </button>
+                                        </td>
+                                        
+                                      
                                         <% } 
                                         
                                         %>
@@ -340,6 +405,58 @@ $(".addroom").click(function() {
 </script>
 
 
+<script>
+  $("#View_unallocated").click(function() {
+    // Show confirmation message using SweetAlert2
+    Swal.fire({
+      width: 900,
+        html: `
+				<h5 class="mt-4 pb-3 font-weight-bold" style="color:#ff4b13; opacity:90%;">List of UnAllocated Students</h5>
+              <div class="table-responsive "  style="overflow-x:auto; ">
+                                    <table class="tab p-2 mt-3 text-center" style="margin:0 auto;">
+                                        <thead>
+                                            <tr>
+                                            
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Course</th>
+                                                <th scope="col">SID</th>
+                                                <th scope="col">Year</th>
+                                              
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                          <%
+                                              const blocktype = block.type;
+                                              const genderstd = blocktype === "boys" ? "M" : blocktype === "girls" ? "F" : "";
+                                            %>
+                                         <% for (var i = 0; i < unallocated.unallocatedStudents.length; i++) { %>
+                                          <% if (unallocated.unallocatedStudents[i].gender == genderstd){ %>
+                                          <tr>
+                                            <td><%= unallocated.unallocatedStudents[i].name %></td>
+                                            <td><%= unallocated.unallocatedStudents[i].specialization %></td>
+                                            <td><%= unallocated.unallocatedStudents[i].sid %></td>
+                                            <td><%= unallocated.unallocatedStudents[i].year %></td>
+                                          <tr>
+                                            <% } %>
+                                          <% } %>
+                                        </tbody>
+
+                                    </table>
+                                    <br>
+
+                                </div>
+				`,
+				showCancelButton: false,
+				showConfirmButton: false,
+    }).then((result) => {
+        					
+        
+    });
+});
+
+</script>
+
+
 
  <script>
 
@@ -465,7 +582,7 @@ $(".addroom").click(function() {
 
                           <div class="input-box">
 														<label class="input-label">Reason To Remove</label>
-														<textarea type="text" class="input-1" style="height: 150px" onfocus="setFocus(true)" id="reason" onblur="setFocus(false)"></textarea>
+														<textarea type="text" class="input-1" style="height: 150px; border: 1px solid #000;" onfocus="setFocus(true)" id="reason" onblur="setFocus(false)"></textarea>
 												</div>
 										</div>
 								</form>
@@ -502,8 +619,8 @@ $(".addroom").click(function() {
                 // Student successfully removed from "allocations" database
                 Toastify({
                     text: "Student removed from allocations successfully!",
-                    backgroundColor: "#00b09b",
-                    className: "success",
+                    backgroundColor: 'rgba(196,293,206,1)',
+                    className: "toastify-su",
                     position: "top-center",
                 }).showToast();
                 location.reload();
@@ -512,8 +629,8 @@ $(".addroom").click(function() {
                 // Error removing student from "allocations" database
                 Toastify({
                     text: "Error removing student from allocations: " + error.responseText,
-                    backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
-                    className: "error",
+                    className: "error", // Display in the center of the screen
+                  backgroundColor: 'rgba(243,209,209,1)', 
                     position: "top-center",
                 }).showToast();
             }
@@ -523,8 +640,8 @@ $(".addroom").click(function() {
 										// If there was an error updating the block, display an error message using Toastify
 										Toastify({
 												text: "Error removing student: " + error.responseText,
-												backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
-												className: "error",
+												className: "error", // Display in the center of the screen
+                  backgroundColor: 'rgba(243,209,209,1)', 
 												position:"top-center",
 										}).showToast();
 								}
@@ -534,6 +651,159 @@ $(".addroom").click(function() {
     });
 });
 </script>
+
+<script>
+  $(".myButton").click(function() {
+    var roomid1 = $(this).attr("data-id");
+
+
+    // Show confirmation message using SweetAlert2
+    Swal.fire({
+        html: `
+				<h5 class="mt-4 pb-3 font-weight-bold" style="color:#ff4b13; opacity:90%;">Add Students</h5>
+								<form>
+										<div class="form-group">
+                         <div class="input-box">
+
+                          <%
+                              const blocktype1 = block.type;
+                              const genderstd1 = blocktype1 === "boys" ? "M" : blocktype === "girls" ? "F" : "";
+                          %>
+
+                          <% 
+                            const blockid = block._id;
+                
+                          %>
+
+														<label class="input-label">Add Students</label>
+                            <select class="input-1" onfocus="setFocus(true)" onblur="setFocus(false)" id="status" style="border-color:#4f4f4f;font-size:16px; color:#4f4f4f;"  >
+                                          <option value="" disabled selected></option>
+                                          <% for (var i = 0; i < unallocated.unallocatedStudents.length; i++) { %>
+                                          <% if (unallocated.unallocatedStudents[i].gender == genderstd1){ %>
+
+                                            <option 
+                                                  value="<%= unallocated.unallocatedStudents[i].sid %>"
+                                                  data-id="<%= unallocated.unallocatedStudents[i].id %>"
+                                                  data-name="<%= unallocated.unallocatedStudents[i].name %>"
+                                                  data-email="<%= unallocated.unallocatedStudents[i].email %>"
+                                                  data-year="<%= unallocated.unallocatedStudents[i].year %>"
+                                                  data-gender="<%= unallocated.unallocatedStudents[i].gender %>"
+                                    
+                                                  data-blockid = "<%= blockid %>"
+                                                  data-isDisabled = "<%= unallocated.unallocatedStudents[i].disability %>"
+                                                  data-course = "<%= unallocated.unallocatedStudents[i].specialization %>"
+
+                                                >
+                                            <%= unallocated.unallocatedStudents[i].name %>
+                                            </option>
+                                            <% } %>
+                                          <% } %>
+                                         
+                                          
+		                                     
+		                                    </select>
+												</div>
+										</div>
+								</form>
+				`,
+        showCancelButton: true,
+        showConfirmButton: true,
+        confirmButtonColor: "#ff4b13",
+        cancelButtonColor: "#ffffff",
+        confirmButtonText: "Add",
+				preConfirm: () => {
+					// Retrieve the values of the input fields
+					const selectElement = document.getElementById('status');
+          const selectedOption = selectElement.options[selectElement.selectedIndex];
+
+          const sid = selectedOption.value;
+          const student_name = selectedOption.dataset.name;
+          const student = selectedOption.dataset.id;
+          const student_email = selectedOption.dataset.email;
+          const year = selectedOption.dataset.year;
+          const student_gender = selectedOption.dataset.gender;
+          const roomid = roomid1;
+          const blockid = selectedOption.dataset.blockid;
+          const isDisabled = selectedOption.dataset.isDisabled;
+          const course = selectedOption.dataset.course;
+
+					// Return the values as an object
+					return { sid, student_name, student, student_email, year, student_gender, roomid, blockid, isDisabled, course};
+				}
+    }).then((result) => {
+      const {sid, student_name, student, student_email, year, student_gender, roomid, blockid, isDisabled, course} = result.value;
+      $.ajax({
+                url: "/Allocate/api/manual/",
+                method: "POST",
+                data: {sid, student_name, student, student_email, year, student_gender, roomid, blockid, isDisabled, course} ,
+                success: function(response) {
+                    // If the block was successfully updated, display a success message using Toastify and reload the page
+                    Toastify({
+                        text: 'Allocated successfully',
+                        duration: 3000, // Display for 3 seconds
+                        gravity: 'top', // Display at the top of the screen
+                        position: 'center', // Display in the center of the screen
+                        backgroundColor: 'rgba(196,293,206,1)', // Set the background color to white
+                        className: 'toastify-su', // Add a custom CSS class for styling
+                        stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+                        onClick: function() { Toastify.hideAll() } // Hide all toasts when clicked
+                      }).showToast();
+
+                      // Navigate to a different page after the success message is displayed
+                  location.reload();
+                },
+                error: function(error) {
+                  if(error.statusText == "Unprocessable Entity"){
+                    Toastify({
+                      text: 'Given Allocation already exists',
+                      duration: 4000, // Display for 3 seconds
+                      gravity: 'top', // Display at the top of the screen
+                      position: 'center',
+                      className: "error", // Display in the center of the screen
+                      backgroundColor: 'rgba(243,209,209,1)', // Set a gradient background color
+                      stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+                      onClick: function() { Toastify.hideAll() } // Hide all toasts when clicked
+                    }).showToast();
+
+                  }else if (error.status === 500) {
+                Toastify({
+
+                  text: 'Room is full select another roooms to allocate',
+                  duration: 4000, // Display for 3 seconds
+                  gravity: 'top', // Display at the top of the screen
+                  position: 'center',
+                  className: "error", // Display in the center of the screen
+                  backgroundColor: 'rgba(243,209,209,1)', // Set a gradient background color
+                  stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+                  onClick: function () { Toastify.hideAll() } // Hide all toasts when clicked
+                }).showToast();
+
+              } else {
+                Toastify({
+
+                  text: 'Unknown error occured',
+                  duration: 4000, // Display for 3 seconds
+                  gravity: 'top', // Display at the top of the screen
+                  position: 'center',
+                  className: "error", // Display in the center of the screen
+                  backgroundColor: 'rgba(243,209,209,1)', // Set a gradient background color
+                  stopOnFocus: true, // Stop the countdown when the user focuses on the screen
+                  onClick: function () { Toastify.hideAll() } // Hide all toasts when clicked
+                }).showToast();
+
+              }
+                    // If there was an error updating the block, display an error message using Toastify
+                      
+                      
+                }
+            });
+    })
+});
+</script>
+
+
+
+
 <script>
   function setFocus(on) {
             var element = document.activeElement;

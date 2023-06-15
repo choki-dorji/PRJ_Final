@@ -11,6 +11,11 @@ console.log("API: " + API);
 exports.add_room = async (req, res) => {
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   console.log(username);
   const notificationCount = await Request.countDocuments({ clicked: false });
@@ -32,6 +37,11 @@ exports.add_room = async (req, res) => {
 exports.getBlock = async (req, res) => {
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   console.log("user", typeof user);
   console.log("username ", typeof username);
@@ -63,6 +73,11 @@ exports.getBlocks = async (req, res) => {
   const token = req.cookies.tokenABC;
   const err = req.query.error;
   const user = req.cookies.userData;
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   console.log("user", typeof user);
   console.log("username ", typeof username);
@@ -159,6 +174,10 @@ exports.getAllocations = async (req, res) => {
   const currentYear = new Date().getFullYear();
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
 
@@ -196,19 +215,27 @@ exports.getBlockById = async (req, res) => {
   const blockId = req.query.id;
   const currentYear = new Date().getFullYear();
   const user = req.cookies.userData;
+
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
+
   const notificationCount = await Request.countDocuments({ clicked: false });
 
   Promise.all([
     axios.get(`http://localhost:5000/api/blocks/${blockId}`),
     axios.get(`http://localhost:5000/room/api/rooms?blockId=${blockId}`),
     axios.get(`http://localhost:5000/allocate/api/years/${currentYear}`),
+    axios.get(`http://localhost:5000/Allocate/api/unallocatestudents/`),
   ])
     .then((responses) => {
       const blockData = responses[0].data;
       const roomsData = responses[1].data;
       const allocation = responses[2].data;
-      console.log("allocations", allocation);
+      const unallocated = responses[3].data;
+      // console.log("allocations", allocation);
       res.render("blockd/viewBlockDetail", {
         block: blockData,
         rooms: roomsData,
@@ -216,6 +243,7 @@ exports.getBlockById = async (req, res) => {
         allocate: allocation,
         notificationCount: notificationCount,
         username: username,
+        unallocated: unallocated,
       });
     })
     .catch((err) => {
@@ -226,6 +254,10 @@ exports.getBlockById = async (req, res) => {
 exports.update_block = async (req, res) => {
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
   axios
@@ -251,6 +283,10 @@ exports.update_block = async (req, res) => {
 exports.getRooms = async (req, res) => {
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
   // Make a get request to /api/users
@@ -276,6 +312,10 @@ exports.getAllocationbyId = async (req, res) => {
   console.log(year);
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
 
   const notificationCount = await Request.countDocuments({ clicked: false });
@@ -301,6 +341,10 @@ exports.getAllocationbyId = async (req, res) => {
 exports.update_room = async (req, res) => {
   const token = req.cookies.tokenABC;
   const username = req.cookies.userData;
+
+  if (!username || !token) {
+    return res.redirect("/login");
+  }
   const notificationCount = await Request.countDocuments({ clicked: false });
   axios
     .get(API + "room/api/rooms", {
@@ -337,6 +381,7 @@ exports.add_Allocation = (req, res) => {
 exports.getchart = async (req, res) => {
   // Make a get request to /api/users
   const username = req.cookies.userData;
+
   axios
     .get(API + "chart")
     .then(function (response) {
@@ -411,6 +456,10 @@ exports.search_room = async (req, res) => {
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
   const username = JSON.parse(user);
+
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
   const host = req.hostname;
   const notificationCount = await Request.countDocuments({ clicked: false });
 
@@ -446,6 +495,10 @@ exports.displaycreateallocation = async function (req, res) {
   const year = req.query.year;
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
   const yearSelect = req.query.year;
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
@@ -497,8 +550,13 @@ exports.displaycreateallocation = async function (req, res) {
 };
 exports.search_roompage = async function (req, res) {
   const token = req.cookies.tokenABC;
-  const username = req.cookies.userData;
-  const user = JSON.parse(user);
+  const user = req.cookies.userData;
+
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
+
+  const username = JSON.parse(user);
   res.render("search/searchroom", { token: token, username: username });
 };
 
@@ -506,6 +564,10 @@ exports.getWholeAllocationYear = async function (req, res) {
   const year = req.query.year;
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
 
@@ -541,6 +603,10 @@ exports.disable = async (req, res) => {
   const currentYear = new Date().getFullYear();
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
+
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
   Promise.all([
@@ -577,6 +643,9 @@ exports.disableF = async (req, res) => {
   const currentYear = new Date().getFullYear();
   const token = req.cookies.tokenABC;
   const user = req.cookies.userData;
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
   const username = JSON.parse(user);
   const notificationCount = await Request.countDocuments({ clicked: false });
   Promise.all([
@@ -612,6 +681,9 @@ exports.search_roomNav = async (req, res) => {
   const token = req.cookies.tokenABC;
   const err = req.query.error;
   const user = req.cookies.userData;
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
   const username = JSON.parse(user);
   console.log("before axios");
   const urlParams = new URLSearchParams(req._parsedUrl.search);
@@ -653,6 +725,9 @@ exports.search_room01 = async (req, res) => {
   const token = req.cookies.tokenABC;
   const err = req.query.error;
   const user = req.cookies.userData;
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
   const username = JSON.parse(user);
   console.log("before axios");
   const urlParams = new URLSearchParams(req._parsedUrl.search);
@@ -729,6 +804,9 @@ exports.detailsrequest = async function (req, res) {
   const err = req.query.error;
   const urlParams = new URLSearchParams(req._parsedUrl.search);
   const user = req.cookies.userData;
+  if (!user || !token) {
+    return res.redirect("/login");
+  }
   const username = JSON.parse(user);
   console.log("before axios");
   const sid = urlParams.get("sid");
