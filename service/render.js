@@ -4,7 +4,7 @@ const request = require("../models/models");
 const Request = request.Request;
 require("dotenv").config();
 
-// const API = "http://localhost:5000/";
+// const API = "${API}";
 const API = process.env.HOST;
 console.log("API: " + API);
 
@@ -183,7 +183,7 @@ exports.getAllocations = async (req, res) => {
 
   axios
     .all([
-      axios.get(`http://localhost:5000/api/allocations/${currentYear}`),
+      axios.get(`${API}api/allocations/${currentYear}`),
       axios.get(API + "api/students"),
     ])
     .then(
@@ -225,10 +225,10 @@ exports.getBlockById = async (req, res) => {
   const notificationCount = await Request.countDocuments({ clicked: false });
 
   Promise.all([
-    axios.get(`http://localhost:5000/api/blocks/${blockId}`),
-    axios.get(`http://localhost:5000/room/api/rooms?blockId=${blockId}`),
-    axios.get(`http://localhost:5000/allocate/api/years/${currentYear}`),
-    axios.get(`http://localhost:5000/Allocate/api/unallocatestudents/`),
+    axios.get(`${API}api/blocks/${blockId}`),
+    axios.get(`${API}room/api/rooms?blockId=${blockId}`),
+    axios.get(`${API}allocate/api/years/${currentYear}`),
+    axios.get(`${API}Allocate/api/unallocatestudents/`),
   ])
     .then((responses) => {
       const blockData = responses[0].data;
@@ -321,7 +321,7 @@ exports.getAllocationbyId = async (req, res) => {
   const notificationCount = await Request.countDocuments({ clicked: false });
 
   axios
-    .get(`http://localhost:5000/allocate/api/years/${year}`)
+    .get(`${API}allocate/api/years/${year}`)
     .then((responses) => {
       const blockData = responses.data;
       console.log("data", blockData);
@@ -572,11 +572,11 @@ exports.getWholeAllocationYear = async function (req, res) {
   const notificationCount = await Request.countDocuments({ clicked: false });
 
   Promise.all([
-    axios.get(`http://localhost:5000/year/allocations`),
-    axios.get(`http://localhost:5000/Allocate//api/years/${year}`),
-    axios.get(`http://localhost:5000/room/api/rooms`),
-    axios.get(`http://localhost:5000/api/blocks`),
-    axios.get(`http://localhost:5000/year/allocations`),
+    axios.get(`${API}year/allocations`),
+    axios.get(`${API}Allocate//api/years/${year}`),
+    axios.get(`${API}room/api/rooms`),
+    axios.get(`${API}api/blocks`),
+    axios.get(`${API}year/allocations`),
   ])
     .then((responses) => {
       const yearData = responses[0].data;
